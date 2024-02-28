@@ -160,8 +160,8 @@ _invalidate_tlb(void *addr) {
   unsigned long cr4;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 98)
-#if defined(X86_FEATURE_INVPCID_SINGLE) && defined(INVPCID_TYPE_INDIV_ADDR)
-  if (cpu_feature_enabled(X86_FEATURE_INVPCID_SINGLE)) {
+#if defined(X86_FEATURE_INVPCID) && defined(INVPCID_TYPE_INDIV_ADDR)
+  if (cpu_feature_enabled(X86_FEATURE_INVPCID)) {
     for(pcid = 0; pcid < 4096; pcid++) {
       invpcid_flush_one(pcid, (long unsigned int) addr);
     }
@@ -710,7 +710,7 @@ static int __init pteditor_init(void) {
   invalidate_tlb = invalidate_tlb_kernel;
   
 #if defined(__i386__) || defined(__x86_64__)
-  if (!cpu_feature_enabled(X86_FEATURE_INVPCID_SINGLE)) {
+  if (!cpu_feature_enabled(X86_FEATURE_INVPCID)) {
     native_write_cr4_func = (void *) kallsyms_lookup_name("native_write_cr4");
     if(!native_write_cr4_func) {
         pr_alert("Could not retrieve native_write_cr4 function\n");
