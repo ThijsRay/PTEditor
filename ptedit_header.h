@@ -54,6 +54,7 @@ typedef struct {
     };
     /** Page table entry */
     size_t pte;
+    size_t *pte_ptr;
     /** Bitmask indicating which entries are valid/should be updated */
     size_t valid;
 } ptedit_entry_t;
@@ -1177,7 +1178,9 @@ static ptedit_entry_t ptedit_resolve_user_ext(void* address, pid_t pid, ptedit_p
 #endif
         // normal 4kb page
         size_t pfn = (size_t)(ptedit_cast(pmd_entry, ptedit_pmd_t).pfn);
-        pt_entry = deref(pfn * ptedit_pfn_multiply + pti * ptedit_entry_size); //pt[pti];
+        size_t offset = pfn * ptedit_pfn_multiply + pti * ptedit_entry_size;
+        resolved.pte_ptr = (size_t*)(ptedit_vmem + offset);
+        pt_entry = deref(offset); //pt[pti];
         resolved.pte = pt_entry;
         resolved.valid |= PTEDIT_VALID_MASK_PTE;
         if (ptedit_cast(pt_entry, ptedit_pte_t).present != PTEDIT_PAGE_PRESENT) {

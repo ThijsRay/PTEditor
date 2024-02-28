@@ -52,6 +52,7 @@ typedef struct {
     };
     /** Page table entry */
     size_t pte;
+    size_t *pte_ptr;
     /** Bitmask indicating which entries are valid/should be updated */
     size_t valid;
 } ptedit_entry_t;
