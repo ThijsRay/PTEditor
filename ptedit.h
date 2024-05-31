@@ -186,13 +186,13 @@ typedef size_t pid_t;
   * @return 0 Initialization was successful
   * @return -1 Initialization failed
   */
-ptedit_fnc int ptedit_init();
+ptedit_fnc int ptedit_init(void);
 
 /**
  * Releases PTEditor kernel module
  *
  */
-ptedit_fnc void ptedit_cleanup();
+ptedit_fnc void ptedit_cleanup(void);
 
 /**
  * Switch between kernel and user-space implementation
@@ -218,27 +218,6 @@ ptedit_fnc void ptedit_use_implementation(int implementation);
 typedef ptedit_entry_t(*ptedit_resolve_t)(void*, pid_t);
 typedef void (*ptedit_update_t)(void*, pid_t, ptedit_entry_t*);
 
-
-/**
- * Resolves the page-table entries of all levels for a virtual address of a given process.
- *
- * @param[in] address The virtual address to resolve
- * @param[in] pid The pid of the process (0 for own process)
- *
- * @return A structure containing the page-table entries of all levels.
- */
-extern ptedit_fnc ptedit_resolve_t ptedit_resolve;
-
-/**
- * Updates one or more page-table entries for a virtual address of a given process.
- * The TLB for the given address is flushed after updating the entries.
- *
- * @param[in] address The virtual address
- * @param[in] pid The pid of the process (0 for own process)
- * @param[in] vm A structure containing the values for the page-table entries and a bitmask indicating which entries to update
- *
- */
-extern ptedit_fnc ptedit_update_t ptedit_update;
 
 /**
  * Sets a bit directly in the PTE of an address.
@@ -514,7 +493,7 @@ typedef struct {
    *
    * @return Page size of the system in bytes
    */
-ptedit_fnc int ptedit_get_pagesize();
+ptedit_fnc int ptedit_get_pagesize(void);
 
 /** @} */
 
@@ -652,7 +631,7 @@ ptedit_fnc int ptedit_switch_tlb_invalidation(int implementation);
  * A full serializing barrier which stops everything.
  *
  */
-ptedit_fnc void ptedit_full_serializing_barrier();
+ptedit_fnc void ptedit_full_serializing_barrier(void);
 
 /** @} */
 
@@ -672,7 +651,7 @@ ptedit_fnc void ptedit_full_serializing_barrier();
   * @return The memory types in the same format as in the IA32_PAT MSR / MAIR_EL1
   *
   */
-ptedit_fnc size_t ptedit_get_mts();
+ptedit_fnc size_t ptedit_get_mts(void);
 
 /**
  * Programs the value of all memory types (x86 PATs / ARM MAIRs). This is equivalent to writing to the MSR 0x277 (x86) / MAIR_EL1 (ARM) on all CPUs.
@@ -813,6 +792,15 @@ ptedit_fnc void ptedit_print_entry(size_t entry);
  *
  */
 ptedit_fnc void ptedit_print_entry_line(size_t entry, int line);
+
+union ptedit_entry {
+  size_t raw;
+  ptedit_pgd_t pgd;
+  ptedit_p4d_t p4d;
+  ptedit_pud_t pud;
+  ptedit_pmd_t pmd;
+  ptedit_pte_t pte;
+};
 
 /** @} */
 
